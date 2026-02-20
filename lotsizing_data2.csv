@@ -1,0 +1,7 @@
+Machine,Product,Period,Demand,Cost,Holding,Setup,s0
+M1,forchetta,1,100,2.5,0.5,50,10
+M1,forchetta,2,120,2.5,0.5,50,10
+M1,coltello,1,80,3.0,0.7,70,5
+M1,coltello,2,90,3.0,0.7,70,5
+M1,cucchiaio,1,150,2.0,0.4,40,15
+M1,cucchiaio,2,130,2.0,0.4,40,15
