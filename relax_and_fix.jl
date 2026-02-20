@@ -9,8 +9,8 @@ function relax_and_fix(model, time_blocks, binary_blocks)
     m = copy(model)
     set_optimizer(m, Gurobi.Optimizer)
     set_attribute(m, "OutputFlag", 1)
-    #set_attribute(m, "TimeLimit", 120.0)
-    set_attribute(m, "TimeLimit", 180.0)
+    set_attribute(m, "TimeLimit", 120.0)
+    #set_attribute(m, "TimeLimit", 180.0)
     
 
 
