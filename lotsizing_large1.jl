@@ -1,5 +1,5 @@
 # Large instance lot sizing
-using Random
+using Random, JuMP.Containers
 
 Random.seed!(37)
 

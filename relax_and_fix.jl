@@ -9,7 +9,7 @@ function relax_and_fix(model, time_blocks, binary_blocks)
     m = copy(model)
     set_optimizer(m, Gurobi.Optimizer)
     set_attribute(m, "OutputFlag", 1)
-    set_attribute(m, "TimeLimit", 120.0)
+    set_attribute(m, "TimeLimit", 150.0)
     #set_attribute(m, "TimeLimit", 180.0)
     
 
@@ -23,7 +23,7 @@ function relax_and_fix(model, time_blocks, binary_blocks)
 
     all_binaries = [v for v in all_vars if is_binary(v)]
 
-    binaries_current=binary_var_block(m, time_blocks) 
+    binaries_current=binary_var_block_ls(m, time_blocks) 
     
     for (i, block) in enumerate(time_blocks)
         

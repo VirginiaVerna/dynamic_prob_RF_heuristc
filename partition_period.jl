@@ -1,9 +1,28 @@
 # FUNCTION THAT SPLITS THE TIME HORIZON INTO BLOCKS
-# period: total number of periods
-# sub_period_length: length of each block
-# Output: a list of time intervals
-# (E' poco flessibile perché la dimensione dei blocchi si fissa manualmente)
 
+function partition_period(period_range, sub_period_length::Int)
+    blocks = []
+    current_block = Int[]
+
+    for i in period_range
+        push!(current_block, i) 
+
+        if length(current_block) == sub_period_length
+            push!(blocks, current_block)               
+            current_block = Int[]
+        end
+    end
+
+   
+    if !isempty(current_block)
+        push!(blocks, current_block)
+    end
+
+    return blocks
+end
+
+
+#=
 function partition_period(period::Int, sub_period_length::Int)
     blocks = []
     current_block = Int[]
@@ -24,4 +43,5 @@ function partition_period(period::Int, sub_period_length::Int)
     return blocks
 end
 
+=#
 

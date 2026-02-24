@@ -3,16 +3,16 @@
 
 using JuMP.Containers
 
-#=
+
 products=["banana", "apple", "orange"]
 periods=[1,2,3,4,5,6,7,8,9,10]
 machines=["m1"]
-=#
 
+#=
 products=[1,2,3]
 periods=[1,2,3,4,5,6,7,8,9,10]
 machines=[1]
-
+=#
 
 d = [5 5 5 5 5 5 5 5 5 5;
     3 3 3 3 3 3 3 3 3 3;

@@ -1,6 +1,6 @@
 # LOT SIZING PROBLEM - medium 
 
-using Random
+using Random, JuMP.Containers
 
 
 Random.seed!(123)
