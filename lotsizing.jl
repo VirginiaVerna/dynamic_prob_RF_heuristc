@@ -4,7 +4,8 @@
 
 using JuMP, Gurobi
 
-include(joinpath(@__DIR__, "lotsizing_toy1.jl"))
+#include(joinpath(@__DIR__, "lotsizing_toy1.jl"))
+include(joinpath(@__DIR__, "lotsizing_toy2.jl"))
 #include(joinpath(@__DIR__, "lotsizing_medium1.jl"))
 #include(joinpath(@__DIR__, "lotsizing_large1.jl"))
 
@@ -16,7 +17,7 @@ include(joinpath(@__DIR__, "relax_and_fix.jl"))
 
 LSP=Model(Gurobi.Optimizer)
 set_attribute(LSP, "OutputFlag", 1)
-set_attribute(LSP, "TimeLimit", 2100.0)
+set_attribute(LSP, "TimeLimit", 300.0)
 #set_attribute(LSP, "TimeLimit", 2700.0)
 
 
@@ -58,7 +59,7 @@ best_bound=round(objective_bound(LSP), digits=2)
 
 
 # -------- RELAX AND FIX -----------
-blocks=partition_period(periods, 2)
+blocks=partition_period(periods, 3)
 #blocksprintln("\nBlocks: ", blocks)
 #blocks=partition_period(last(periods), 7)
 #blocks=partition_period(last(periods), 30)

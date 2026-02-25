@@ -1,4 +1,4 @@
-# Lot sizing toy INSTANCE 2
+# Lot sizing toy INSTANCE 1
 
 
 using JuMP.Containers

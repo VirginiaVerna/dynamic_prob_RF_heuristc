@@ -16,8 +16,8 @@ I_k=[4,3,5] # set of ideal intervals for activity k
 I=DenseAxisArray(I_k, K)
 l_bar=[1,1,0] # operational periods accumulated before the start of the time horizon for each activity k
 l_bar=DenseAxisArray(l_bar, K)
-U=1000 # downtime cost per unit time
-
+#U=1000 # downtime cost per unit time
+U=5000
 
 A_t=build_travel_arcs(K,T,I,l_bar)
 #println("Travel arcs: ", A_t)

@@ -14,7 +14,10 @@ include(joinpath(@__DIR__, "relax_and_fix.jl"))
 
 TM=Model(Gurobi.Optimizer)
 set_optimizer_attribute(TM, "OutputFlag", 1)
-set_optimizer_attribute(TM, "TimeLimit", 1800)
+set_optimizer_attribute(TM, "TimeLimit", 300)
+#set_optimizer_attribute(TM, "TimeLimit", 1800)
+
+
 
 # Variables
 @variable(TM, x[k in K, a in A_t[k]], Bin)
@@ -53,7 +56,7 @@ for k in K, j in periods if j > 0 # j=0 already in the first constraint
         sum(x[k, a] for a in A_t[k] if a[1] == j)
     )
 end
-end
+
 
 
 
@@ -89,7 +92,7 @@ gurobi_cost=round(objective_value(TM), digits=2)
 best_bound=round(objective_bound(TM), digits=2) 
 
 
-#=
+
 if termination_status(TM) == MOI.OPTIMAL
     println("\n--- OPTIMAL SOLUTION DETAILS ---")
     
@@ -128,7 +131,7 @@ if termination_status(TM) == MOI.OPTIMAL
 else
     println("No optimal solution found.")
 end
-=#
+
 
 
 
