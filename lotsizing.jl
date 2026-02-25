@@ -43,6 +43,10 @@ set_attribute(LSP, "TimeLimit", 2100.0)
 
 
 
+write_to_file(LSP, "lotsizing.lp")
+
+
+
 # -------- GUROBI ------------
 optimize!(LSP)
 println("Termination status: $(termination_status(LSP))")
