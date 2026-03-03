@@ -43,7 +43,7 @@ for k in K
 end
 
 
-for k in K, j in periods #, j in 1:T
+for k in K, j in periods
     @constraint(TM, 
         sum(x[k, a] for a in A_t[k] if a[2] == j) == 
         sum(y[k, a] for a in A_m[k] if a[1] == j)
@@ -61,7 +61,7 @@ end
 
 
 
-for k in K, j in periods # j in 1:T
+for k in K, j in periods
     @constraint(TM, 
         z[j] >= sum(y[k, a] for a in A_m[k] if a[1] <= j < a[2])
     )
@@ -84,8 +84,10 @@ end
 
 
 
-
+##################################################################
 # -------- GUROBI ------------
+##################################################################
+
 optimize!(TM)
 println("Termination status: $(termination_status(TM))")
 
@@ -93,7 +95,7 @@ gurobi_cost=round(objective_value(TM), digits=2)
 best_bound=round(objective_bound(TM), digits=2) 
 
 
-
+# Print the schedules and downtime status
 if termination_status(TM) == MOI.OPTIMAL || termination_status(TM) == MOI.TIME_LIMIT
     println("\n--- OPTIMAL SOLUTION DETAILS ---")
     
@@ -104,7 +106,6 @@ if termination_status(TM) == MOI.OPTIMAL || termination_status(TM) == MOI.TIME_L
         for a in A_t[k]
             if value(x[k, a]) > 0.5
                 i, j, l = a
-                # Distinguish between internal and sink arcs
                 dest = (j == "T") ? "Sink (End)" : "Node $j"
                 println("    - From $i to $dest: Operative periods (l) = $l")
             end
@@ -135,15 +136,38 @@ end
 
 
 
+println("\n--- ACTIVE BINARY VARIABLES GUROBI---")
+for k in K
+    for a in A_t[k]
+        if value(x[k,a]) > 0.5
+            println("x[$k,$a] = ", value(x[k,a]))
+        end
+    end
+
+    for a in A_m[k]
+        if value(y[k,a]) > 0.5
+            println("y[$k,$a] = ", value(y[k,a]))
+        end
+    end
+end
+
+for j in periods
+    if value(z[j]) > 0.5
+        println("z[$j] = ", value(z[j]))
+    end
+end
 
 
+##################################################################
 # ----- RELAX AND FIX -----
+##################################################################
 
 #blocks=partition_period(periods, 3) # toy instance
 blocks=partition_period(periods, 5) # medium instance
-println("\nTime blocks: ", blocks)
+#println("\nTime blocks: ", blocks)
 
 binary_blocks=binary_var_block_tm(TM, blocks)
+#println(binary_blocks)
 #println("\nBinary variables per block:")
 #for (i, vars) in enumerate(binary_blocks)
 #    println("  Block $i: ", length(vars), " binary variables")
@@ -154,6 +178,51 @@ binary_blocks=binary_var_block_tm(TM, blocks)
 rf_solution, rf_cost=relax_and_fix(TM, blocks, binary_blocks)
 
 
+
+println("\n--- RELAX & FIX SOLUTION ---")
+for k in K
+    println("\nActivity: $k")
+    
+    println("  Travel Path:")
+    for a in A_t[k]
+        var_name = "x[$k,$a]"
+        if haskey(rf_solution, var_name) && rf_solution[var_name] > 0.5
+            i, j, l = a
+            dest = (j == "T") ? "Sink (End)" : "Node $j"
+            println("    - From $i to $dest: Operative periods (l) = $l")
+        end
+    end
+    
+    println("  Maintenance Schedule:")
+    maintenance_found = false
+    for a in A_m[k]
+        var_name = "y[$k,$a]"
+        if haskey(rf_solution, var_name) && rf_solution[var_name] > 0.5
+            maintenance_found = true
+            i, j = a
+            println("    - Scheduled from period $i to $j (Duration: $(j-i))")
+        end
+    end
+    if !maintenance_found
+        println("    - No maintenance performed within the horizon.")
+    end
+end
+
+println("\n--- TRAIN DOWNTIME STATUS (z_j) ---")
+for j in periods
+    var_name = "z[$j]"
+    status = haskey(rf_solution, var_name) && rf_solution[var_name] > 0.5 ? "STOPPED (Downtime)" : "RUNNING"
+    println("  Period $j: $status")
+end
+
+
+println("\n--- ACTIVE BINARY VARIABLES RF ---")
+for (var_name, val) in rf_solution
+    if val > 0.5 && (occursin("x", var_name) || occursin("y", var_name))
+        println("$var_name = $val")
+    end
+end
+
 # ----- RESULTS -------
 
 println("\n" * "="^40)
@@ -162,14 +231,6 @@ println("="^40)
 println("Gurobi objective: ", gurobi_cost)
 println("Gurobi best bound: ", best_bound)
 println("Relax and fix objective: ", round(rf_cost, digits=2))
+println("Gap between RF and Gurobi best bound: ", round(abs(rf_cost - gurobi_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=4), "%")
+
 println("="^40)
-
-
-#=
-println("\n--- ALL ACTIVE BINARY VARIABLES ---")
-for (var_name, val) in rf_solution
-    if val > 0.5 && (occursin("x", var_name) || occursin("y", var_name))
-        println("$var_name = $val")
-    end
-end
-=#
