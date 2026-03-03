@@ -9,30 +9,30 @@ Random.seed!(67)
 
 
 K=["k$i" for i in 1:4] # set of activities
-R=["r$i" for i in 1:2] # set of resources
+R=["r$i" for i in 1:3] # set of resources
 T=25 # time horizon
 periods=0:T-1
 
-p = rand(2:5, length(K))
+p = rand(3:5, length(K))
 p = DenseAxisArray(p, K)
 
 
-I = rand(4:7, length(K))
+I = rand(8:2:12, length(K))
 I = DenseAxisArray(I, K)
 
 
-l_bar = [rand(0:I[k]) for k in K]
+l_bar = [rand(2:I[k]-2) for k in K]
 l_bar = DenseAxisArray(l_bar, K)
 
 
-U = 900 
+U = 4000 
 
 
 A_t = build_travel_arcs(K, T, I, l_bar)
 A_m = build_maintenance_arcs(K, T, p)
 
 
-C_k = rand(400:800, length(K))
+C_k = rand(200:100:500, length(K))
 C_k = DenseAxisArray(C_k, K)
 
 M_costs = build_costs(K, T, I, C_k, A_t)
@@ -43,13 +43,15 @@ Q = DenseAxisArray(zeros(Float64, T, length(R)), periods, R)
 
 # r1 could be the number of maintenance bays available, while r2 could represent labor hours available.
 for (i, k) in enumerate(K)
-    q[k, "r1"] = 1.0  # Each task requires 1 bay
-    q[k, "r2"] = p[k] * 1.5 
+    q[k, "r1"] = 4.0 
+    q[k, "r2"] = rand(1.8:0.1:2.5)
+    q[k, "r3"] = rand(2:0.5:4.0)  
 end
 
 for t in periods
-    Q[t, "r1"] = 3.0 # 3 bays
-    Q[t, "r2"] = 15.0 
+    Q[t, "r1"] = 13.0
+    Q[t, "r2"] = 22.0
+    Q[t, "r3"] = 10.0
 end
 
 
