@@ -5,20 +5,24 @@
 using JuMP, Gurobi
 
 #include(joinpath(@__DIR__, "lotsizing_toy1.jl"))
-include(joinpath(@__DIR__, "lotsizing_toy2.jl"))
+#include(joinpath(@__DIR__, "lotsizing_toy2.jl"))
+#include(joinpath(@__DIR__, "lotsizing_toy3.jl"))
+include(joinpath(@__DIR__, "lotsizing_toy4.jl"))
 #include(joinpath(@__DIR__, "lotsizing_medium1.jl"))
+#include(joinpath(@__DIR__, "lotsizing_medium2.jl"))
 #include(joinpath(@__DIR__, "lotsizing_large1.jl"))
 
 include(joinpath(@__DIR__, "partition_period.jl"))
 include(joinpath(@__DIR__, "binary_var_block_ls.jl"))
 include(joinpath(@__DIR__, "relax_and_fix.jl"))
+include(joinpath(@__DIR__, "save_ls_solution.jl"))
 
 
 
 LSP=Model(Gurobi.Optimizer)
 set_attribute(LSP, "OutputFlag", 1)
 set_attribute(LSP, "TimeLimit", 300.0)
-#set_attribute(LSP, "TimeLimit", 2700.0)
+#set_attribute(LSP, "TimeLimit", 2700.0) 
 
 
 # Variables
@@ -55,22 +59,28 @@ println("Termination status: $(termination_status(LSP))")
 gurobi_cost=round(objective_value(LSP), digits=2)
 best_bound=round(objective_bound(LSP), digits=2) 
 
-
+# save gurobi solution
+if termination_status(LSP) == OPTIMAL || termination_status(LSP) == TIME_LIMIT
+    save_ls_solution("gurobi_solution.csv", machines, products, periods; model=LSP)
+end
 
 
 # -------- RELAX AND FIX -----------
-blocks=partition_period(periods, 3)
-#blocksprintln("\nBlocks: ", blocks)
-#blocks=partition_period(last(periods), 7)
-#blocks=partition_period(last(periods), 30)
+blocks=partition_period(periods, 3) # toy instance
+#blocks=partition_period(periods, 10) # medium instance
+#blocks=partition_period(periods, 30)
 
 binary_blocks=binary_var_block_ls(LSP, blocks)
 
 
 rf_solution, rf_cost=relax_and_fix(LSP, blocks, binary_blocks)
 
-
-
+# save RF solution
+if rf_solution !== nothing
+    save_ls_solution("relax_fix_solution.csv", machines, products, periods; rf_sol=rf_solution)
+else
+    println("Relax and Fix did not find a feasible solution.")
+end
 
 
 # ----- RESULTS -------
@@ -81,4 +91,13 @@ println("="^40)
 println("Gurobi objective: ", gurobi_cost)
 println("Gurobi best bound: ", best_bound)
 println("Relax and fix objective: ", round(rf_cost, digits=2))
+println("Gurobi gap: ", round(abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=4), "%")
 println("="^40)
+
+
+#=
+println("\nGenerating plots...")
+include("visualize_ls_gurobi.jl")
+
+generate_comparison_plots("gurobi_solution.csv", "relax_fix_solution.csv")
+=#
