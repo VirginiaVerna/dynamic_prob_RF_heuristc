@@ -17,15 +17,16 @@ p = rand(3:5, length(K))
 p = DenseAxisArray(p, K)
 
 
-I = rand(8:2:12, length(K))
+#I = rand(8:2:12, length(K))
+I = rand(10:2:14, length(K))
 I = DenseAxisArray(I, K)
 
 
 l_bar = [rand(2:I[k]-2) for k in K]
 l_bar = DenseAxisArray(l_bar, K)
 
-
-U = 4000 
+U=4000
+ 
 
 
 A_t = build_travel_arcs(K, T, I, l_bar)
