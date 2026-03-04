@@ -24,7 +24,8 @@ function build_travel_arcs(K, T, I, l_bar)
         end
         
         # --- A_t2 ---
-        for i in max(0, T - I[k]):T-1  # max(0,...) in case I[k] > T ()
+        #for i in max(0, T - I[k]):T-1  # max(0,...) in case I[k] > T ()
+        for i in T-I[k]:T-1
             push!(arcs, (i, "T", I[k]))
         end
         
@@ -47,9 +48,9 @@ function build_maintenance_arcs(K, T, p)
         
         for i in 0:T-1
             j = i + duration
-            if j <= T
-                push!(arcs, (i, j))
-            end
+            #if j <= T # ???
+            push!(arcs, (i, j))
+            #end
         end
         
         A_m[k] = arcs
