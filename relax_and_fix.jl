@@ -64,7 +64,7 @@ function relax_and_fix(model, time_blocks, binary_blocks)
                 println("  Selected: $v = $val")
             end
         end
-
+        
         #----------- CHECK -----------------------
         # 3. FOR DEBUGGING
         status = termination_status(m)
