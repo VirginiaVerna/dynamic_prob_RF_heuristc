@@ -3,8 +3,8 @@
 
 using JuMP, Gurobi
 
-#include(joinpath(@__DIR__, "trainmaintenance_toy1.jl"))
-include(joinpath(@__DIR__, "trainmaintenance_medium1.jl"))
+include(joinpath(@__DIR__, "trainmaintenance_toy1.jl"))
+#include(joinpath(@__DIR__, "trainmaintenance_medium1.jl"))
 
 
 include(joinpath(@__DIR__, "partition_period.jl"))
@@ -162,8 +162,8 @@ end
 # ----- RELAX AND FIX -----
 ##################################################################
 
-#blocks=partition_period(periods, 3) # toy instance
-blocks=partition_period(periods, 5) # medium instance
+blocks=partition_period(periods, 3) # toy instance
+#blocks=partition_period(periods, 5) # medium instance
 #println("\nTime blocks: ", blocks)
 
 binary_blocks=binary_var_block_tm(TM, blocks)
