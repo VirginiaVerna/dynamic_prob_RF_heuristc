@@ -120,7 +120,7 @@ println("="^40)
 println("Gurobi objective: ", gurobi_cost)
 println("Gurobi best bound: ", best_bound)
 println("Relax and fix objective: ", round(rf_cost, digits=2))
-println("Gurobi gap: ", round(100*abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=2), "%")
+println("Gap: ", round(100*abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=2), "%")
 println("="^40)
 
 
