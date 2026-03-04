@@ -5,9 +5,9 @@
 using JuMP, Gurobi
 
 #include(joinpath(@__DIR__, "lotsizing_toy1.jl"))
-#include(joinpath(@__DIR__, "lotsizing_toy2.jl"))
+include(joinpath(@__DIR__, "lotsizing_toy2.jl"))
 #include(joinpath(@__DIR__, "lotsizing_toy3.jl"))
-include(joinpath(@__DIR__, "lotsizing_toy4.jl"))
+#include(joinpath(@__DIR__, "lotsizing_toy4.jl"))
 #include(joinpath(@__DIR__, "lotsizing_medium1.jl"))
 #include(joinpath(@__DIR__, "lotsizing_medium2.jl"))
 #include(joinpath(@__DIR__, "lotsizing_large1.jl"))
@@ -64,6 +64,35 @@ if termination_status(LSP) == OPTIMAL || termination_status(LSP) == TIME_LIMIT
     save_ls_solution("gurobi_solution.csv", machines, products, periods; model=LSP)
 end
 
+# Optimal solution details
+
+if termination_status(LSP) == MOI.OPTIMAL
+    println("RESULTS: ")
+    println("Objective: $(objective_value(LSP))")
+        for t in periods
+        println("Period ", t)
+        println("-------------------------")
+        for j in products
+            s_val = value(s[j, t])
+            println("Product ", j)
+            println("  Stock = ", s_val)
+            for i in machines
+                x_val = value(x[i, j, t])
+                y_val = value(y[i, j, t])
+                println("    Machine ", i,
+                            ", production = ", x_val,
+                            ", setup = ", y_val
+                )
+            end
+        end
+        println()
+    end
+else
+    println("No solution")
+end
+        
+
+
 
 # -------- RELAX AND FIX -----------
 blocks=partition_period(periods, 3) # toy instance
@@ -91,7 +120,7 @@ println("="^40)
 println("Gurobi objective: ", gurobi_cost)
 println("Gurobi best bound: ", best_bound)
 println("Relax and fix objective: ", round(rf_cost, digits=2))
-println("Gurobi gap: ", round(abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=4), "%")
+println("Gurobi gap: ", round(100*abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=2), "%")
 println("="^40)
 
 
