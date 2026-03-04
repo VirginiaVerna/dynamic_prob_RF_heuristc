@@ -14,8 +14,8 @@ include(joinpath(@__DIR__, "relax_and_fix.jl"))
 
 TM=Model(Gurobi.Optimizer)
 set_optimizer_attribute(TM, "OutputFlag", 1)
-#set_optimizer_attribute(TM, "TimeLimit", 300)
-set_optimizer_attribute(TM, "TimeLimit", 2700) 
+set_optimizer_attribute(TM, "TimeLimit", 300)
+#set_optimizer_attribute(TM, "TimeLimit", 2700) 
 #set_optimizer_attribute(TM, "TimeLimit", 21600) # 6 hours
 
 
@@ -231,6 +231,6 @@ println("="^40)
 println("Gurobi objective: ", gurobi_cost)
 println("Gurobi best bound: ", best_bound)
 println("Relax and fix objective: ", round(rf_cost, digits=2))
-println("Gap between RF and Gurobi best bound: ", round(abs(rf_cost - gurobi_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=4), "%")
+println("Gap between RF and Gurobi best bound: ", round(100*abs(gurobi_cost - rf_cost)/max(abs(gurobi_cost), abs(rf_cost)), digits=2), "%")
 
 println("="^40)
