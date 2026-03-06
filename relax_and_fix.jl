@@ -1,5 +1,3 @@
-# NEW RELAX AND FIX
-
 #### RELAX AND FIX  
 
 using JuMP, Gurobi
@@ -29,7 +27,7 @@ function relax_and_fix(model, time_blocks, binary_blocks)
 
     for (i, block) in enumerate(time_blocks)
         
-        println("--- Risolvo blocco $(i)/$(length(time_blocks)): $block ---")
+        println("--- Solve block $(i)/$(length(time_blocks)): $block ---")
                 
         # Relaxing the binary variables not fixed and not in the current block
         for v in all_binaries
@@ -129,7 +127,7 @@ function relax_and_fix(model, time_blocks, binary_blocks)
     
 
     status = termination_status(m)
-    if status != MOI.OPTIMAL
+    if status != MOI.OPTIMAL #&& status != MOI.TIME_LIMIT
         println("Final problem infeasible.")
         return nothing
     end
